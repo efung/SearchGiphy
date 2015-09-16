@@ -1,5 +1,6 @@
 package com.github.efung.searchgiphy.service;
 
+import com.github.efung.searchgiphy.model.GiphyTranslateResponse;
 import com.github.efung.searchgiphy.model.Rating;
 import com.github.efung.searchgiphy.model.GiphyResponse;
 
@@ -21,7 +22,7 @@ public interface GiphyService {
             @Query("fmt") String format);
 
     @GET("/v1/gifs/translate")
-    Call<GiphyResponse> translateText(
+    Call<GiphyTranslateResponse> translateText(
             @Query("s") String searchTerm,
             @Query("rating") Rating rating,
             @Query("fmt") String format);

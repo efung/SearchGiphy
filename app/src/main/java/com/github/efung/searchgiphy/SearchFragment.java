@@ -8,10 +8,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.github.efung.searchgiphy.adapter.GiphyResultAdapter;
 import com.github.efung.searchgiphy.model.GiphyResponse;
+import com.github.efung.searchgiphy.model.GiphyTranslateResponse;
 import com.github.efung.searchgiphy.model.ImagesMetadata;
+import com.github.efung.searchgiphy.model.Rating;
 import com.github.efung.searchgiphy.model.SearchType;
 import com.github.efung.searchgiphy.service.ApiKeyQueryParamInterceptor;
 import com.github.efung.searchgiphy.service.GiphyService;
@@ -24,8 +27,6 @@ import retrofit.Callback;
 import retrofit.MoshiConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
-
-import static java.util.Collections.EMPTY_LIST;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -92,33 +93,55 @@ public class SearchFragment extends Fragment {
         if (TextUtils.isEmpty(currentSearchTerm) || currentSearchType == null) {
             return;
         }
-        Call<GiphyResponse> call = null;
         switch (currentSearchType) {
             case TYPE_GIFS:
-                call = service.searchGifs(currentSearchTerm, null, null, null, null);
+                Call<GiphyResponse> call = service.searchGifs(currentSearchTerm, null, null, Rating.RATING_G, null);
+                call.enqueue(new GiphyResponseCallback());
                 break;
             case TYPE_TEXT:
-                call = service.translateText(currentSearchTerm, null, null);
+                Call<GiphyTranslateResponse> translateCall = service.translateText(currentSearchTerm, Rating.RATING_G, null);
+                translateCall.enqueue(new GiphyTranslateResponseCallback());
                 break;
             case TYPE_STICKERS:
-                call = service.searchStickers(currentSearchTerm, null, null, null, null);
+                call = service.searchStickers(currentSearchTerm, null, null, Rating.RATING_G, null);
+                call.enqueue(new GiphyResponseCallback());
                 break;
         }
 
-        call.enqueue(new ResponseCallback());
     }
 
-    private class ResponseCallback implements Callback<GiphyResponse> {
+    private class GiphyTranslateResponseCallback implements Callback<GiphyTranslateResponse> {
+
+        @Override
+        public void onResponse(Response<GiphyTranslateResponse> retrofitResponse) {
+            GiphyTranslateResponse response = retrofitResponse.body();
+            if (response.meta.status == 200) {
+                ((GiphyResultAdapter)resultsView.getAdapter()).setItems(Collections.singletonList(response.data));
+            } else {
+                Toast.makeText(getActivity(), response.meta.msg, Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+
+        }
+    }
+    private class GiphyResponseCallback implements Callback<GiphyResponse> {
         @Override
         public void onResponse(Response<GiphyResponse> retrofitResponse) {
             GiphyResponse response = retrofitResponse.body();
             if (response.meta.status == 200) {
                 ((GiphyResultAdapter)resultsView.getAdapter()).setItems(response.data);
+            } else {
+                Toast.makeText(getActivity(), response.meta.msg, Toast.LENGTH_LONG).show();
             }
         }
 
         @Override
         public void onFailure(Throwable t) {
+            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
 
         }
 
