@@ -34,14 +34,13 @@
                     android:id="@+id/search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/title"
                     android:iconifiedByDefault="false" />
             </LinearLayout>
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/search"
                 android:checkedButton="@+id/type_gifs"
                 android:orientation="horizontal">
 
