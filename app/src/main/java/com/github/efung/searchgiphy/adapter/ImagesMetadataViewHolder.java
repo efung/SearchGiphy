@@ -13,10 +13,20 @@ import com.github.efung.searchgiphy.R;
 public class ImagesMetadataViewHolder extends RecyclerView.ViewHolder {
     public ImageView image;
     public TextView title;
+    private OnItemClickListener listener;
 
-    public ImagesMetadataViewHolder(View itemView) {
+    public ImagesMetadataViewHolder(View itemView, final OnItemClickListener listener) {
         super(itemView);
         image = (ImageView) itemView.findViewById(R.id.image);
         title = (TextView) itemView.findViewById(R.id.title);
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onItemClick(v, );
+                }
+            }
+        });
+        this.listener = listener;
     }
 }

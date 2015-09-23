@@ -67,9 +67,17 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, container, false);
         resultsView = (RecyclerView) v.findViewById(R.id.results);
-        resultsView.setAdapter(new GiphyResultAdapter(container.getContext(), Collections.<ImagesMetadata>emptyList()));
-        resultsView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        resultsView.setAdapter(getAdapter(container));
+        resultsView.setLayoutManager(getLayoutManager());
         return v;
+    }
+
+    protected RecyclerView.LayoutManager getLayoutManager() {
+        return new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+    }
+
+    protected RecyclerView.Adapter getAdapter(ViewGroup container) {
+        return new GiphyResultAdapter(container.getContext(), Collections.<ImagesMetadata>emptyList());
     }
 
     @Override

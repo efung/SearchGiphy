@@ -20,6 +20,8 @@ import java.util.List;
 public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewHolder> {
     private Context context;
     private List<ImagesMetadata> items;
+    private OnItemClickListener itemClickListener;
+
 
     public GiphyResultAdapter(Context context, List<ImagesMetadata> items) {
         this.context = context;
@@ -31,10 +33,14 @@ public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewH
         notifyDataSetChanged();
     }
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        itemClickListener = listener;
+    }
+
     @Override
     public ImagesMetadataViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_result_cell, null);
-        ImagesMetadataViewHolder holder = new ImagesMetadataViewHolder(layoutView);
+        ImagesMetadataViewHolder holder = new ImagesMetadataViewHolder(layoutView, itemClickListener);
         return holder;
     }
 
@@ -59,8 +65,8 @@ public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewH
         }
     }
 
-        @Override
-        public int getItemCount () {
-            return items.size();
-        }
+    @Override
+    public int getItemCount () {
+        return items.size();
     }
+}
