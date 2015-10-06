@@ -1,6 +1,6 @@
 package com.github.efung.searchgiphy;
 
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +29,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         searchTypeRadio = (RadioGroup) toolbar.findViewById(R.id.type);
         searchTypeRadio.setOnCheckedChangeListener(this);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, createSearchFragment(), FRAGMENT_TAG).commit();
+        getFragmentManager().beginTransaction().replace(R.id.container, createSearchFragment(), FRAGMENT_TAG).commit();
     }
 
     private Fragment createSearchFragment() {
@@ -38,7 +38,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Fragment f = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        Fragment f = getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (f != null) {
             SearchFragment sf = (SearchFragment)f;
             sf.setSearchTerm(query);
@@ -55,7 +55,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        Fragment f = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        Fragment f = getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (f != null) {
             SearchFragment sf = (SearchFragment)f;
             sf.setSearchType(getSearchType());
