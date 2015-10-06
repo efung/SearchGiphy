@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.github.efung.searchgiphy.R;
 import com.github.efung.searchgiphy.model.GiphyImage;
 import com.github.efung.searchgiphy.model.ImagesMetadata;
+import com.github.efung.searchgiphy.util.DrawableHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewHolder> {
     private Context context;
     private List<ImagesMetadata> items;
-    private OnItemClickListener itemClickListener;
+    private OnItemClickListener<ImagesMetadataViewHolder> itemClickListener;
 
 
     public GiphyResultAdapter(Context context, List<ImagesMetadata> items) {
@@ -33,8 +34,12 @@ public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewH
         notifyDataSetChanged();
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(OnItemClickListener<ImagesMetadataViewHolder> listener) {
         itemClickListener = listener;
+    }
+
+    public ImagesMetadata getItem(int position) {
+        return items.get(position);
     }
 
     @Override
@@ -51,14 +56,10 @@ public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewH
         if (data.images != null) {
             if (data.images.original_still != null) {
                 image = data.images.original_still;
-            } else if (data.images.fixed_width_still != null) {
-                image = data.images.fixed_width_still;
-            } else if (data.images.fixed_width_small_still != null) {
-                image = data.images.fixed_width_small_still;
             }
         }
         if (image != null) {
-            Picasso.with(context).load(image.url).into(holder.image);
+            Picasso.with(context).load(image.url).placeholder(DrawableHelper.getRandomColorDrawable(context)).into(holder.image);
             if (!TextUtils.isEmpty(data.caption)) {
                 holder.title.setText(data.caption);
             }
@@ -67,6 +68,6 @@ public class GiphyResultAdapter extends RecyclerView.Adapter<ImagesMetadataViewH
 
     @Override
     public int getItemCount () {
-        return items.size();
+        return items == null ? 0 : items.size();
     }
 }

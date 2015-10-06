@@ -5,4 +5,29 @@
     <color name="colorAccent">#FFC107</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="textColorSecondary">#FFFFFF</color>
+
+    <color name="red100">#FFCDD2</color>
+    <color name="purple100">#E1BEE7</color>
+    <color name="blue100">#BBDEFB</color>
+    <color name="cyan100">#B2EBF2</color>
+    <color name="green100">#C8E6C9</color>
+    <color name="lime100">#F0F4C3</color>
+    <color name="amber100">#FFECB3</color>
+    <color name="deeporange100">#FFCCBC</color>
+    <color name="brown100">#D7CCC8</color>
+    <color name="bluegray100">#CFD8DC</color>
+    <color name="gray_opaque80">#88212121</color>
+
+    <array name="placeholderColors">
+        <item>@color/red100</item>
+        <item>@color/purple100</item>
+        <item>@color/blue100</item>
+        <item>@color/cyan100</item>
+        <item>@color/green100</item>
+        <item>@color/lime100</item>
+        <item>@color/amber100</item>
+        <item>@color/deeporange100</item>
+        <item>@color/brown100</item>
+        <item>@color/bluegray100</item>
+    </array>
 </resources>

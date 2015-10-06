@@ -1,39 +1,42 @@
 package com.github.efung.searchgiphy;
 
+import android.app.ActivityOptions;
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.github.efung.searchgiphy.adapter.GiphyResultAdapter;
-import com.github.efung.searchgiphy.model.GiphyResponse;
-import com.github.efung.searchgiphy.model.GiphyTranslateResponse;
+import com.github.efung.searchgiphy.adapter.ImagesMetadataViewHolder;
+import com.github.efung.searchgiphy.adapter.OnItemClickListener;
 import com.github.efung.searchgiphy.model.ImagesMetadata;
-import com.github.efung.searchgiphy.model.Rating;
 import com.github.efung.searchgiphy.model.SearchType;
 import com.github.efung.searchgiphy.service.ApiKeyQueryParamInterceptor;
+import com.github.efung.searchgiphy.service.GiphySearchResultsLoader;
 import com.github.efung.searchgiphy.service.GiphyService;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.Collections;
+import java.util.List;
 
-import retrofit.Call;
-import retrofit.Callback;
 import retrofit.MoshiConverterFactory;
-import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements OnItemClickListener<ImagesMetadataViewHolder>, LoaderManager.LoaderCallbacks<List<ImagesMetadata>> {
     public static final String ARG_SEARCH = "search";
     private RecyclerView resultsView;
+    private GiphyResultAdapter adapter;
     private String currentSearchTerm;
     private SearchType currentSearchType;
     private GiphyService service;
@@ -67,7 +70,9 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, container, false);
         resultsView = (RecyclerView) v.findViewById(R.id.results);
-        resultsView.setAdapter(getAdapter(container));
+        adapter = getAdapter(container);
+        adapter.setOnItemClickListener(this);
+        resultsView.setAdapter(adapter);
         resultsView.setLayoutManager(getLayoutManager());
         return v;
     }
@@ -76,8 +81,15 @@ public class SearchFragment extends Fragment {
         return new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
     }
 
-    protected RecyclerView.Adapter getAdapter(ViewGroup container) {
+    protected GiphyResultAdapter getAdapter(ViewGroup container) {
         return new GiphyResultAdapter(container.getContext(), Collections.<ImagesMetadata>emptyList());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -101,57 +113,26 @@ public class SearchFragment extends Fragment {
         if (TextUtils.isEmpty(currentSearchTerm) || currentSearchType == null) {
             return;
         }
-        switch (currentSearchType) {
-            case TYPE_GIFS:
-                Call<GiphyResponse> call = service.searchGifs(currentSearchTerm, null, null, Rating.RATING_G, null);
-                call.enqueue(new GiphyResponseCallback());
-                break;
-            case TYPE_TEXT:
-                Call<GiphyTranslateResponse> translateCall = service.translateText(currentSearchTerm, Rating.RATING_G, null);
-                translateCall.enqueue(new GiphyTranslateResponseCallback());
-                break;
-            case TYPE_STICKERS:
-                call = service.searchStickers(currentSearchTerm, null, null, Rating.RATING_G, null);
-                call.enqueue(new GiphyResponseCallback());
-                break;
-        }
+        getLoaderManager().restartLoader(0, null, this);
+    }
+
+    @Override
+    public void onItemClick(View itemView, ImagesMetadataViewHolder viewHolder, int adapterPosition) {
+    }
+
+    @Override
+    public Loader<List<ImagesMetadata>> onCreateLoader(int id, Bundle args) {
+        return new GiphySearchResultsLoader(getActivity(), service, currentSearchType, currentSearchTerm);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<ImagesMetadata>> loader, List<ImagesMetadata> data) {
+        ((GiphyResultAdapter)resultsView.getAdapter()).setItems(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<ImagesMetadata>> loader) {
 
     }
 
-    private class GiphyTranslateResponseCallback implements Callback<GiphyTranslateResponse> {
-
-        @Override
-        public void onResponse(Response<GiphyTranslateResponse> retrofitResponse) {
-            GiphyTranslateResponse response = retrofitResponse.body();
-            if (response.meta.status == 200) {
-                ((GiphyResultAdapter)resultsView.getAdapter()).setItems(Collections.singletonList(response.data));
-            } else {
-                Toast.makeText(getActivity(), response.meta.msg, Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-
-        }
-    }
-    private class GiphyResponseCallback implements Callback<GiphyResponse> {
-        @Override
-        public void onResponse(Response<GiphyResponse> retrofitResponse) {
-            GiphyResponse response = retrofitResponse.body();
-            if (response.meta.status == 200) {
-                ((GiphyResultAdapter)resultsView.getAdapter()).setItems(response.data);
-            } else {
-                Toast.makeText(getActivity(), response.meta.msg, Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-            Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-
-        }
-
-    }
 }

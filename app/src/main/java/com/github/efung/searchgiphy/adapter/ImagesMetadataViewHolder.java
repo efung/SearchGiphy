@@ -13,9 +13,9 @@ import com.github.efung.searchgiphy.R;
 public class ImagesMetadataViewHolder extends RecyclerView.ViewHolder {
     public ImageView image;
     public TextView title;
-    private OnItemClickListener listener;
+    private OnItemClickListener<ImagesMetadataViewHolder> listener;
 
-    public ImagesMetadataViewHolder(View itemView, final OnItemClickListener listener) {
+    public ImagesMetadataViewHolder(View itemView, final OnItemClickListener<ImagesMetadataViewHolder> listener) {
         super(itemView);
         image = (ImageView) itemView.findViewById(R.id.image);
         title = (TextView) itemView.findViewById(R.id.title);
@@ -23,7 +23,7 @@ public class ImagesMetadataViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
-                    listener.onItemClick(v, );
+                    listener.onItemClick(v, ImagesMetadataViewHolder.this, getAdapterPosition());
                 }
             }
         });
